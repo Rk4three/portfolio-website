@@ -50,7 +50,7 @@ const projects: Project[] = [
   },
   {
     id: 2,
-    title: "Task Management System",
+    title: "",
     image: "/modern-task-management-interface-with-kanban-board.jpg",
     techStack: ["TypeScript", "React", "Supabase", "Vite"],
     description:
@@ -60,13 +60,13 @@ const projects: Project[] = [
   },
   {
     id: 3,
-    title: "Weather Analytics Dashboard",
-    image: "/weather-dashboard-with-maps-and-data-visualization.jpg",
-    techStack: ["JavaScript", "React", "DigitalOcean", "CSS"],
+    title: "Smart Resume Matcher",
+    image: "/project-3.png",
+    techStack: ["Python", "FastAPI", "JavaScript", "React", "HTML", "CSS", "Supabase", "PostgreSQL", "Railway", "Vercel", "Docker", "Tailwind CSS", "Groq AI"],
     description:
-      "A comprehensive weather analytics dashboard that provides detailed weather insights, forecasts, and historical data visualization. Features interactive maps and customizable weather alerts.",
-    githubUrl: "https://github.com/rionkudo/weather-dashboard",
-    liveUrl: "https://weather-analytics-rk.vercel.app",
+      "A smart, AI-powered tool that analyzes a resume against a job description to provide an instant compatibility score, highlighting matched skills, identifying gaps, and offering actionable suggestions for improvement.",
+    githubUrl: "https://github.com/Rk4three/smart-resume-matcher",
+    liveUrl: "https://smart-resume-matcher.vercel.app/",
   },
 ]
 
@@ -391,7 +391,7 @@ export default function Portfolio() {
 
               <motion.section variants={itemVariants}>
                 <motion.h2 className="text-2xl sm:text-3xl font-bold mb-6 lg:mb-8 text-slate-200">
-                  Featured Projects
+                  Personal Projects
                 </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                   {projects.map((project, index) => (

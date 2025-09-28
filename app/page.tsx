@@ -74,22 +74,27 @@ const techCategories = [
   {
     title: "Languages & Frameworks",
     icon: <Code className="w-5 h-5" />,
-    skills: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Python"],
+    skills: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Python", "Node.js"],
   },
   {
     title: "Styling & Tooling",
     icon: <Wrench className="w-5 h-5" />,
-    skills: ["Tailwind CSS", "Vite"],
+    skills: ["Tailwind CSS", "Vite", "Shadcn/ui"],
   },
   {
     title: "Databases & Cloud",
     icon: <Database className="w-5 h-5" />,
-    skills: ["MySQL", "Supabase (Postgres)", "DigitalOcean"],
+    skills: ["MySQL", "Supabase (Postgres)", "DigitalOcean", "Vercel"],
   },
   {
     title: "Developer Tools",
     icon: <Wrench className="w-5 h-5" />,
     skills: ["Git", "GitHub", "npm", "Yarn", "Docker", "VS Code"],
+  },
+  {
+    title: "APIs & Services",
+    icon: <Wrench className="w-5 h-5" />,
+    skills: ["Groq AI", "Deepgram"],
   },
 ]
 

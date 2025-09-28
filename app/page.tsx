@@ -84,7 +84,7 @@ const techCategories = [
   {
     title: "Databases & Cloud",
     icon: <Database className="w-5 h-5" />,
-    skills: ["MySQL", "Supabase (Postgres)", "DigitalOcean", "Vercel"],
+    skills: ["MySQL", "Supabase (Postgres)", "DigitalOcean", "Vercel", "Railway"],
   },
   {
     title: "Developer Tools",

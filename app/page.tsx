@@ -42,7 +42,7 @@ const projects: Project[] = [
     id: 1,
     title: "AI Meeting Summarizer",
     image: "/project-1.png",
-    techStack: ["React", "Vite", "TypeScript", "Tailwind CSS", "Shadcn/ui", "Vercel (inlucding edge functions)", "Groq AI", "Deepgram"],
+    techStack: ["React", "Vite", "TypeScript", "Tailwind CSS", "Shadcn/ui", "Vercel (including edge functions)", "Groq AI", "Deepgram"],
     description:
       "This is a portfolio project demonstrating a full-stack web application that leverages AI to enhance meeting productivity. The application can transcribe audio from meetings (from file uploads or live recordings), identify different speakers, and generate a structured, actionable summary of the conversation.",
     githubUrl: "https://github.com/Rk4three/ai-meeting-summarizer",
@@ -52,7 +52,7 @@ const projects: Project[] = [
     id: 2,
     title: "AI Finance Tracker",
     image: "project-2.png",
-    techStack: ["TypeScript", "React", "Supabase", "Vite", "Deno", "Tailwind CSS", "Shadcn/ui", "Groq AI"],
+    techStack: ["TypeScript", "React", "Supabase", "Vite", "Deno", "Tailwind CSS", "Shadcn/ui", "Groq AI", "Vercel"],
     description:
       "A personal finance tracker featuring an AI assistant. Built with React and TypeScript, this app allows users to import transactions via CSV, visualize spending with interactive charts, and ask questions in natural language using Groq AI. The backend is powered by a Supabase Deno Edge Function.",
     githubUrl: "https://github.com/Rk4three/ai-finance-tracker",

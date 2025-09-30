@@ -51,12 +51,12 @@ const projects: Project[] = [
   {
     id: 2,
     title: "",
-    image: "/modern-task-management-interface-with-kanban-board.jpg",
-    techStack: ["TypeScript", "React", "Supabase", "Vite"],
+    image: "project-2.png",
+    techStack: ["TypeScript", "React", "Supabase", "Vite", "Deno", "Tailwind CSS", "Shadcn/ui", "Groq AI"],
     description:
-      "A collaborative task management system with real-time updates, drag-and-drop functionality, and team collaboration features. Built with modern web technologies for optimal performance.",
-    githubUrl: "https://github.com/rionkudo/task-manager",
-    liveUrl: "https://task-manager-rk.vercel.app",
+      "A personal finance tracker featuring an AI assistant. Built with React and TypeScript, this app allows users to import transactions via CSV, visualize spending with interactive charts, and ask questions in natural language using Groq AI. The backend is powered by a Supabase Deno Edge Function.",
+    githubUrl: "https://github.com/Rk4three/ai-finance-tracker",
+    liveUrl: "https://ai-finance-tracker-steel.vercel.app/",
   },
   {
     id: 3,
@@ -74,7 +74,7 @@ const techCategories = [
   {
     title: "Languages & Frameworks",
     icon: <Code className="w-5 h-5" />,
-    skills: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Python", "Node.js"],
+    skills: ["HTML", "CSS", "JavaScript/TypeScript", "React", "Python", "Node.js", "Deno"],
   },
   {
     title: "Styling & Tooling",
@@ -84,7 +84,7 @@ const techCategories = [
   {
     title: "Databases & Cloud",
     icon: <Database className="w-5 h-5" />,
-    skills: ["MySQL", "Supabase (Postgres)", "DigitalOcean", "Vercel", "Railway"],
+    skills: ["MySQL", "PostgreSQL", "Supabase", "DigitalOcean", "Vercel", "Railway"],
   },
   {
     title: "Developer Tools",
@@ -306,8 +306,8 @@ export default function Portfolio() {
                       </motion.h2>
                       <p className="text-base lg:text-lg leading-relaxed text-slate-200">
                         I'm a 4th-year Computer Science student passionate about Artificial Intelligence, Machine
-                        Learning, and software engineering. Skilled in React, Python, and SQL, I enjoy building projects
-                        that turn ideas into practical solutions like my AI-powered personal finance tracker.
+                        Learning, and software engineering. Skilled in Python, React, and SQL, I enjoy building projects
+                        that turn ideas into practical solutions.
                         <br />
                         <br />
                         As I prepare for my internship and future career in tech, I'm eager to apply my skills in

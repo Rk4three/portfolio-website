@@ -50,7 +50,7 @@ const projects: Project[] = [
   },
   {
     id: 2,
-    title: "",
+    title: "AI Finance Tracker",
     image: "project-2.png",
     techStack: ["TypeScript", "React", "Supabase", "Vite", "Deno", "Tailwind CSS", "Shadcn/ui", "Groq AI"],
     description:

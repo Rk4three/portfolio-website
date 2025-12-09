@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -34,6 +34,122 @@ import Image from "next/image"
 
 const MotionDialogContent = motion(DialogContent as any)
 
+// ──────────────────────────────────────
+// Emerald Meteor Background Component
+// ──────────────────────────────────────
+function MeteorBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+    resizeCanvas()
+    window.addEventListener("resize", resizeCanvas)
+
+    interface Meteor {
+      x: number
+      y: number
+      speed: number
+      length: number
+      thickness: number
+      opacity: number
+    }
+
+    const meteors: Meteor[] = []
+    const meteorCount = 20 
+
+    const spawnMeteor = (init = false): Meteor => {
+      let startX, startY;
+      
+      if (init) {
+        startX = Math.random() * canvas.width * 1.5 - canvas.width * 0.2
+        startY = Math.random() * canvas.height * 1.5 - canvas.height * 0.5
+      } else {
+        if (Math.random() > 0.5) {
+          startX = Math.random() * canvas.width * 1.5 
+          startY = -100 - Math.random() * 100
+        } else {
+          startX = canvas.width + 100 + Math.random() * 100
+          startY = Math.random() * canvas.height * 1.2 - canvas.height * 0.2
+        }
+      }
+
+      return {
+        x: startX,
+        y: startY,
+        speed: 2 + Math.random() * 3, 
+        length: 100 + Math.random() * 80,
+        thickness: 1 + Math.random() * 1.5,
+        opacity: 0.4 + Math.random() * 0.4,
+      }
+    }
+
+    for (let i = 0; i < meteorCount; i++) {
+      meteors.push(spawnMeteor(true))
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      meteors.forEach((m, index) => {
+        const tailX = m.x + m.length
+        const tailY = m.y - m.length
+
+        const gradient = ctx.createLinearGradient(m.x, m.y, tailX, tailY)
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${m.opacity})`)
+        gradient.addColorStop(0.1, `rgba(16, 185, 129, ${m.opacity})`)
+        gradient.addColorStop(1, "rgba(16, 185, 129, 0)")
+
+        ctx.strokeStyle = gradient
+        ctx.lineWidth = m.thickness
+        ctx.lineCap = "round"
+        ctx.beginPath()
+        ctx.moveTo(m.x, m.y)
+        ctx.lineTo(tailX, tailY)
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.arc(m.x, m.y, m.thickness * 1.5, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255, 255, 255, ${m.opacity})`
+        ctx.shadowBlur = 10
+        ctx.shadowColor = "rgba(16, 185, 129, 1)"
+        ctx.fill()
+        ctx.shadowBlur = 0 
+
+        m.x -= m.speed
+        m.y += m.speed
+
+        if (m.x < -200 || m.y > canvas.height + 200) {
+          meteors[index] = spawnMeteor()
+        }
+      })
+
+      requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    return () => {
+      window.removeEventListener("resize", resizeCanvas)
+    }
+  }, [])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0"
+      style={{ mixBlendMode: "screen" }} 
+    />
+  )
+}
+
 interface Project {
   id: number
   title: string
@@ -54,19 +170,19 @@ const projects: Project[] = [
       "TypeScript",
       "Tailwind CSS",
       "Shadcn/ui",
-      "Vercel (including edge functions)",
+      "Vercel (edge)",
       "Groq AI",
       "Deepgram",
     ],
     description:
-      "This is a portfolio project demonstrating a full-stack web application that leverages AI to enhance meeting productivity. The application can transcribe audio from meetings (from file uploads or live recordings), identify different speakers, and generate a structured, actionable summary of the conversation.",
+      "This is a portfolio project demonstrating a full-stack web application that leverages AI to enhance meeting productivity. The application can transcribe audio from meetings, identify speakers, and generate actionable summaries.",
     githubUrl: "https://github.com/Rk4three/ai-meeting-summarizer",
     liveUrl: "https://ai-meeting-summarizer-gray-seven.vercel.app/",
   },
   {
     id: 2,
     title: "AI Finance Tracker",
-    image: "project-2.png",
+    image: "/project-2.png",
     techStack: [
       "TypeScript",
       "React",
@@ -77,7 +193,7 @@ const projects: Project[] = [
       "Vercel",
     ],
     description:
-      "A personal finance tracker featuring an AI assistant. Built with React and TypeScript, this app allows users to import transactions via CSV, visualize spending with interactive charts, and ask questions in natural language using Groq AI. The backend is powered by a Supabase Deno Edge Function.",
+      "A personal finance tracker featuring an AI assistant. Built with React and TypeScript, this app allows users to import transactions via CSV, visualize spending with interactive charts, and ask questions in natural language.",
     githubUrl: "https://github.com/Rk4three/ai-finance-tracker",
     liveUrl: "https://ai-finance-tracker-steel.vercel.app/",
   },
@@ -88,20 +204,16 @@ const projects: Project[] = [
     techStack: [
       "Python",
       "FastAPI",
-      "JavaScript",
       "React",
-      "HTML",
-      "CSS",
       "Supabase",
       "PostgreSQL",
       "Railway",
       "Vercel",
       "Docker",
-      "Tailwind CSS",
       "Groq AI",
     ],
     description:
-      "A smart, AI-powered tool that analyzes a resume against a job description to provide an instant compatibility score, highlighting matched skills, identifying gaps, and offering actionable suggestions for improvement.",
+      "A smart, AI-powered tool that analyzes a resume against a job description to provide an instant compatibility score, highlighting matched skills, identifying gaps, and offering actionable suggestions.",
     githubUrl: "https://github.com/Rk4three/smart-resume-matcher",
     liveUrl: "https://smart-resume-matcher.vercel.app/",
   },
@@ -128,7 +240,6 @@ const techCategories = [
     icon: <Cloud className="w-5 h-5" />,
     skills: ["DigitalOcean", "Vercel", "Railway"],
   },
-
   {
     title: "Developer Tools",
     icon: <Wrench className="w-5 h-5" />,
@@ -158,15 +269,13 @@ const contactInfo = [
     label: "Email",
     value: "rioncal@gmail.com",
     icon: <Mail className="w-5 h-5" />,
-    color: "emerald",
-    href: "mailto:rion.kudo@gmail.com",
+    href: "mailto:rioncal@gmail.com",
   },
   {
     type: "github",
     label: "GitHub",
     value: "github.com/Rk4three",
     icon: <Github className="w-5 h-5" />,
-    color: "slate",
     href: "https://github.com/Rk4three",
   },
   {
@@ -174,7 +283,6 @@ const contactInfo = [
     label: "LinkedIn",
     value: "linkedin.com/in/rion-kudo",
     icon: <Linkedin className="w-5 h-5" />,
-    color: "blue",
     href: "https://www.linkedin.com/in/rion-kudo-a6ab76248/",
   },
   {
@@ -182,7 +290,6 @@ const contactInfo = [
     label: "Resume",
     value: "",
     icon: <FileText className="w-5 h-5" />,
-    color: "blue",
     href: RESUME_URL,
   },
 ]
@@ -209,361 +316,209 @@ export default function Portfolio() {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
   }
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
-    },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } },
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-emerald-950/20 to-slate-950 relative">
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-          className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-slate-500/10 rounded-full blur-3xl"
-        />
-      </div>
+    <>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(16, 185, 129, 0.2);
+          border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(16, 185, 129, 0.5);
+        }
+      `}</style>
 
-      <motion.div
-        initial="hidden"
-        animate={isVisible ? "visible" : "hidden"}
-        variants={containerVariants}
-        className="relative z-10 min-h-screen"
-      >
-        <div className="block lg:flex min-h-screen">
+      <div className="h-screen bg-[#0b1a1f] text-white overflow-hidden relative font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
+        
+        <MeteorBackground />
+
+        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
+            <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-emerald-900/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] bg-blue-900/10 rounded-full blur-[100px]" />
+        </div>
+
+        <motion.div
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+          variants={containerVariants}
+          className="relative z-10 h-full flex flex-col lg:flex-row"
+        >
+          
+          {/* Sidebar */}
           <motion.div
             variants={itemVariants}
-            className="w-full lg:w-80 bg-slate-900/80 backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-slate-700/50 p-4 sm:p-6 lg:p-8 flex flex-col justify-center lg:sticky lg:top-0 lg:h-screen"
+            className="
+              w-full lg:w-80 shrink-0 
+              bg-slate-900/80 backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-slate-700/50 
+              flex flex-col lg:h-full z-20 shadow-2xl
+            "
           >
-            <motion.div
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-              className="relative mb-6 lg:mb-8"
-            >
-              <div className="w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 mx-auto relative">
-                <Image
-                  src="rion-kudo-picture.jpg"
-                  alt="Rion Kudo"
-                  width={160}
-                  height={160}
-                  className="rounded-2xl shadow-2xl border-2 border-emerald-400/30 w-full h-full object-cover"
-                />
+            <div className="p-6 lg:p-8 flex flex-col justify-center h-full overflow-y-auto custom-scrollbar">
+                
                 <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                  className="absolute -inset-2 rounded-2xl border border-dashed border-emerald-400/40"
-                />
-              </div>
-            </motion.div>
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+                className="relative mb-6 mx-auto"
+                >
+                <div className="w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 relative group">
+                    <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl group-hover:bg-emerald-500/30 transition-all duration-500" />
+                    
+                    <Image
+                    src="/rion-kudo-picture.jpg"
+                    alt="Rion Kudo"
+                    width={160}
+                    height={160}
+                    className="relative z-10 rounded-2xl shadow-2xl border border-emerald-500/20 w-full h-full object-cover"
+                    />
+                    
+                    <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute -inset-3 rounded-2xl border border-dashed border-emerald-500/30 z-0"
+                    />
+                </div>
+                </motion.div>
 
-            <motion.h1
-              variants={itemVariants}
-              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 text-center"
-            >
-              Rion Kudo
-            </motion.h1>
+                <motion.h1 variants={itemVariants} className="text-2xl lg:text-3xl font-bold text-white mb-2 text-center tracking-tight">
+                Rion Kudo
+                </motion.h1>
+                <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 text-emerald-400 mb-8">
+                <MapPin className="w-3.5 h-3.5" />
+                <span className="text-xs font-medium uppercase tracking-wider">Angeles City, Pampanga</span>
+                </motion.div>
 
-            <motion.div
-              variants={itemVariants}
-              className="flex items-center justify-center gap-2 text-emerald-300 mb-6 lg:mb-8"
-            >
-              <MapPin className="w-4 h-4" />
-              <span className="text-sm">Angeles City, Pampanga</span>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="space-y-3 lg:space-y-4">
-              {contactInfo.map((contact) => {
-                const isResume = contact.type === "resume"
-
-                return (
-                  <motion.div
-                    key={contact.type}
-                    whileHover={{ scale: 1.02, x: 8 }}
-                    className="group"
-                  >
-                    <div
-                      className="bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 hover:border-emerald-400/50 rounded-xl p-3 lg:p-4 transition-all duration-300 cursor-pointer"
-                      onClick={isResume ? () => setIsResumeOpen(true) : undefined}
-                    >
-                      <div className="flex items-center justify-between">
-                        {isResume ? (
-                          <div className="flex flex-1 min-w-0 items-center justify-center gap-3">
-                            <div className="text-emerald-400 group-hover:scale-110 transition-transform">
-                              {contact.icon}
+                <motion.div variants={itemVariants} className="space-y-3">
+                {contactInfo.map((contact) => {
+                    const isResume = contact.type === "resume"
+                    return (
+                    <motion.div key={contact.type} whileHover={{ scale: 1.02 }} className="group">
+                        <div
+                        className="bg-slate-800/40 hover:bg-slate-800/80 border border-slate-700/50 hover:border-emerald-500/30 rounded-lg p-3 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
+                        onClick={isResume ? () => setIsResumeOpen(true) : undefined}
+                        >
+                        <div className="flex items-center justify-between">
+                            {isResume ? (
+                            <div className="flex flex-1 items-center justify-center gap-3">
+                                <div className="text-emerald-400 group-hover:scale-110 transition-transform">
+                                {contact.icon}
+                                </div>
+                                <div className="text-center">
+                                <div className="text-sm font-semibold text-white">View Resume</div>
+                                </div>
                             </div>
-                            <div className="min-w-0 flex-1 text-center">
-                              <div className="text-sm font-semibold text-white">
-                                {contact.label}
-                              </div>
-                              <div className="text-xs text-slate-400">View & download</div>
-                            </div>
-                          </div>
-                        ) : (
-                          <a
-                            href={contact.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 flex-1 min-w-0"
-                          >
-                            <div className="text-emerald-400 group-hover:scale-110 transition-transform">
-                              {contact.icon}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="text-xs text-slate-400 uppercase tracking-wide">
-                                {contact.label}
-                              </div>
-                              <div className="text-white text-sm font-medium break-all sm:truncate">
-                                {contact.value}
-                              </div>
-                            </div>
-                          </a>
-                        )}
-
-                        {!isResume && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => copyToClipboard(contact.value, contact.type)}
-                            className="text-slate-400 hover:text-emerald-400 transition-colors p-1 ml-2"
-                          >
-                            {copiedContact === contact.type ? (
-                              <Check className="w-4 h-4" />
                             ) : (
-                              <Copy className="w-4 h-4" />
+                            <a href={contact.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className="text-emerald-400 group-hover:scale-110 transition-transform">
+                                {contact.icon}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">{contact.label}</div>
+                                <div className="text-slate-200 text-sm font-medium truncate">{contact.value}</div>
+                                </div>
+                            </a>
                             )}
-                          </motion.button>
-                        )}
+                            {!isResume && (
+                            <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={(e) => {
+                                e.stopPropagation()
+                                copyToClipboard(contact.value, contact.type)
+                                }}
+                                className="text-slate-500 hover:text-emerald-400 transition-colors p-1.5"
+                            >
+                                {copiedContact === contact.type ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                            </motion.button>
+                            )}
+                        </div>
+                        </div>
+                    </motion.div>
+                    )
+                })}
+                </motion.div>
 
-                        {isResume && (
-                          <motion.a
-                            href={RESUME_URL}
-                            download="Rion_Kudo_Resume.pdf"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="text-slate-400 hover:text-emerald-400 transition-colors p-1 ml-2"
-                          >
-                            <Download className="w-4 h-4" />
-                          </motion.a>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </motion.div>
-
-            <motion.div
-              variants={itemVariants}
-              className="mt-6 lg:mt-8 flex items-center justify-center gap-2 text-emerald-400"
-            >
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-xs">Available for opportunities</span>
-            </motion.div>
+                <motion.div variants={itemVariants} className="mt-8 flex items-center justify-center gap-2.5">
+                    <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-xs font-medium text-emerald-400/90 tracking-wide">Available for Work and Opportunities</span>
+                </motion.div>
+            </div>
           </motion.div>
 
-          <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-            <div className="max-w-4xl mx-auto space-y-12 lg:space-y-16">
+          {/* Main Content */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-900/20">
+            <div className="max-w-5xl mx-auto p-4 sm:p-8 lg:p-12 space-y-12 lg:space-y-20 pb-20">
+              
+              {/* About Me */}
               <motion.section variants={itemVariants}>
+                <div className="mb-6">
+                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">About Me</h2>
+                </div>
                 <motion.div whileHover={{ scale: 1.01 }} className="group">
-                  <Card className="p-4 sm:p-6 lg:p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 group-hover:border-emerald-400/30 transition-all duration-500">
-                    <CardContent className="p-0">
-                      <motion.h2 className="text-2xl sm:text-3xl font-bold mb-4 lg:mb-6 text-emerald-400">
-                        About Me
-                      </motion.h2>
-                      <p className="text-base lg:text-lg leading-relaxed text-slate-200">
+                  <Card className="bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/20 transition-all duration-500 shadow-xl">
+                    <CardContent className="p-6 lg:p-8">
+                      <p className="text-base lg:text-lg leading-loose text-slate-300 font-light">
                         I'm a 4th-year Computer Science student passionate about Artificial Intelligence,
                         Machine Learning, and software engineering. Skilled in Python, React, and SQL, I
                         enjoy building projects that turn ideas into practical solutions.
-                        <br />
-                        <br />
+                        <br /><br />
                         As I prepare for my internship and future career in tech, I'm eager to apply my
                         skills in real-world settings, contribute to innovative teams, and continue growing
-                        as a problem-solver and lifelong learner. Outside coding, I enjoy strategy games
-                        that sharpen my analytical thinking.
+                        as a problem-solver.
                       </p>
                     </CardContent>
                   </Card>
                 </motion.div>
               </motion.section>
 
+              {/* Tech Stack */}
               <motion.section variants={itemVariants}>
-                <motion.h2 className="text-2xl sm:text-3xl font-bold mb-6 lg:mb-8 text-slate-200">
-                  Tech Stack
-                </motion.h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+                <div className="mb-8">
+                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">Tech Stack</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {techCategories.map((category, index) => (
                     <motion.div
                       key={category.title}
                       variants={itemVariants}
-                      whileHover={{ scale: 1.02, y: -4 }}
+                      whileHover={{ y: -4 }}
                       className="group"
                     >
-                      <Card className="h-full p-4 lg:p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 group-hover:border-emerald-400/30 transition-all duration-500">
-                        <CardContent className="p-0">
+                      <Card className="h-full bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/20 transition-all duration-300">
+                        <CardContent className="p-5">
                           <div className="flex items-center gap-3 mb-4">
-                            <motion.div className="text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+                            <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 group-hover:text-emerald-300 group-hover:bg-emerald-500/20 transition-colors">
                               {category.icon}
-                            </motion.div>
-                            <h3 className="font-semibold text-white text-sm lg:text-base">
+                            </div>
+                            <h3 className="font-semibold text-slate-100">
                               {category.title}
                             </h3>
                           </div>
                           <div className="flex flex-wrap gap-2">
                             {category.skills.map((skill, skillIndex) => (
-                              <motion.div
-                                key={skill}
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: skillIndex * 0.05 }}
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                <Badge
-                                  variant="secondary"
-                                  className="text-xs bg-emerald-500/20 border-emerald-400/30 text-emerald-100 hover:bg-emerald-500/30 transition-all duration-300"
-                                >
-                                  {skill}
-                                </Badge>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.section>
-
-              <motion.section variants={itemVariants}>
-                <motion.h2 className="text-2xl sm:text-3xl font-bold mb-6 lg:mb-8 text-slate-200">
-                  Soft Skills
-                </motion.h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-4">
-                  {softSkills.map((skill, index) => (
-                    <motion.div
-                      key={skill.name}
-                      variants={itemVariants}
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="group cursor-pointer"
-                    >
-                      <Card className="p-3 lg:p-4 text-center bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 group-hover:border-emerald-400/30 transition-all duration-500">
-                        <CardContent className="p-0">
-                          <motion.div className="text-emerald-400 mb-2 flex justify-center group-hover:scale-110 transition-transform duration-300">
-                            {skill.icon}
-                          </motion.div>
-                          <p className="text-xs lg:text-sm font-medium text-slate-200">
-                            {skill.name}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.section>
-
-              {/* Personal Projects */}
-              <motion.section variants={itemVariants}>
-                <motion.h2 className="text-2xl sm:text-3xl font-bold mb-6 lg:mb-8 text-slate-200">
-                  Personal Projects
-                </motion.h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {projects.map((project) => (
-                    <motion.div
-                      key={project.id}
-                      variants={itemVariants}
-                      whileHover={{ scale: 1.03, y: -8 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="group cursor-pointer h-full"
-                      onClick={() => setSelectedProject(project)}
-                    >
-                      <Card className="h-full flex flex-col overflow-hidden bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 group-hover:border-emerald-400/30 transition-all duration-500 group-hover:shadow-xl group-hover:shadow-emerald-400/10">
-                        
-                        {/* 
-                           UPDATE: 
-                           1. Top padding reduced further to pt-1.
-                           2. Bottom padding increased to pb-3 to match the mb-3 of the stack/image gaps.
-                        */}
-                        <CardContent className="flex-1 flex flex-col px-4 lg:px-6 pt-1 pb-3">
-                          
-                          {/* 
-                             UPDATE: 
-                             Title bottom margin increased to mb-3.
-                          */}
-                          <h3 className="text-lg lg:text-xl font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300 mb-3">
-                            {project.title}
-                          </h3>
-
-                          {/* 
-                             UPDATE: 
-                             Image bottom margin increased to mb-3.
-                             This ensures spacing between Image and Stack is similar to spacing between Title and Image.
-                          */}
-                          <div className="relative overflow-hidden rounded-lg mb-3">
-                            <Image
-                              src={project.image || "/placeholder.svg"}
-                              alt={project.title}
-                              width={400}
-                              height={300}
-                              className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                            <motion.div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <motion.div
-                              className="absolute top-4 right-4 opacity-0 group-hover:opacity-100"
-                              initial={{ scale: 0 }}
-                              whileHover={{ scale: 1 }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <ExternalLink className="w-5 h-5 text-emerald-400" />
-                            </motion.div>
-                          </div>
-
-                          <div className="flex flex-wrap gap-2">
-                            {project.techStack.map((tech) => (
                               <Badge
-                                key={tech}
-                                variant="outline"
-                                className="text-xs border-slate-600 text-slate-300 hover:border-emerald-400/50 hover:text-emerald-300 transition-all duration-300"
+                                key={skill}
+                                variant="secondary"
+                                className="bg-slate-800/50 text-slate-300 border-slate-700/50 hover:bg-emerald-500/10 hover:text-emerald-300 hover:border-emerald-500/20 transition-all"
                               >
-                                {tech}
+                                {skill}
                               </Badge>
                             ))}
                           </div>
@@ -574,127 +529,202 @@ export default function Portfolio() {
                 </div>
               </motion.section>
 
+              {/* Soft Skills */}
+              <motion.section variants={itemVariants}>
+                 <div className="mb-8">
+                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">Soft Skills</h2>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {softSkills.map((skill, index) => (
+                    <motion.div
+                      key={skill.name}
+                      whileHover={{ scale: 1.05 }}
+                      className="group"
+                    >
+                      <div className="h-full p-4 flex flex-col items-center justify-center text-center bg-slate-900/40 border border-slate-800 rounded-xl hover:border-emerald-500/30 hover:bg-emerald-900/5 transition-all duration-300 cursor-default">
+                          <div className="text-emerald-400 mb-2 group-hover:scale-110 transition-transform">
+                            {skill.icon}
+                          </div>
+                          <span className="text-xs font-medium text-slate-300 group-hover:text-white">
+                            {skill.name}
+                          </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.section>
 
-              <motion.footer variants={itemVariants} className="text-center py-6 lg:py-8">
-                <motion.p className="text-slate-400 text-sm lg:text-base">
-                  Built using React, TypeScript, and Tailwind CSS
-                </motion.p>
+              {/* Projects */}
+              <motion.section variants={itemVariants}>
+                <div className="mb-8">
+                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">Projects</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {projects.map((project) => (
+                    <motion.div
+                      key={project.id}
+                      layoutId={`project-${project.id}`}
+                      whileHover={{ y: -8 }}
+                      onClick={() => setSelectedProject(project)}
+                      className="group cursor-pointer h-full"
+                    >
+                      {/* Removed min-h-[500px] to allow symmetrical height based on content */}
+                      <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
+                        <CardContent className="flex-1 flex flex-col p-0">
+                          
+                          <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
+                             <Image
+                                src={project.image || "/placeholder.svg"}
+                                alt={project.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                             />
+                             <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
+                          </div>
+
+                          <div className="p-5 flex flex-col flex-1">
+                              <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
+                                  {project.title}
+                              </h3>
+
+                              <div className="flex flex-wrap gap-2 mt-4">
+                                {project.techStack.map((tech) => (
+                                  <Badge
+                                    key={tech}
+                                    variant="outline"
+                                    className="text-xs py-1 px-2 border-slate-700 text-slate-400 group-hover:border-emerald-500/30 group-hover:text-emerald-300"
+                                  >
+                                    {tech}
+                                  </Badge>
+                                ))}
+                              </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.section>
+
+              <motion.footer className="text-center pt-8 border-t border-slate-800/50">
+                <p className="text-slate-500 text-sm">
+                  © {new Date().getFullYear()} Rion Kudo. Built with <span className="text-emerald-500">React</span> & <span className="text-emerald-500">Tailwind</span>.
+                </p>
               </motion.footer>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
 
-      {/* Project dialog */}
-      <AnimatePresence>
-        {selectedProject && (
-          <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
-            <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 m-4">
-              <DialogHeader>
-                <DialogTitle className="flex items-center justify-between text-white pr-8">
-                  <span className="text-lg lg:text-xl">{selectedProject.title}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedProject(null)}
-                    className="h-6 w-6 p-0 text-slate-400 hover:text-emerald-400 absolute right-4 top-4"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </DialogTitle>
+        {/* Project Dialog */}
+        <AnimatePresence>
+          {selectedProject && (
+            <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
+              <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900/95 backdrop-blur-xl border border-slate-700 p-0 overflow-hidden shadow-2xl">
+                
+                <DialogHeader className="p-6 pb-0">
+                  <DialogTitle className="flex items-center justify-between text-white">
+                    <span className="text-2xl font-bold text-emerald-400">{selectedProject.title}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedProject(null)}
+                      className="text-slate-400 hover:text-white hover:bg-white/10"
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="p-6 space-y-6">
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/50 shadow-lg">
+                    <Image
+                      src={selectedProject.image || "/placeholder.svg"}
+                      alt={selectedProject.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProject.techStack.map((tech) => (
+                      <Badge
+                        key={tech}
+                        className="bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20"
+                      >
+                        {tech}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <p className="text-slate-300 leading-relaxed text-base">
+                    {selectedProject.description}
+                  </p>
+
+                  <div className="flex gap-4 pt-2">
+                    <Button asChild className="flex-1 bg-white text-slate-900 hover:bg-emerald-50 font-semibold">
+                      <a href={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer">
+                        <Github className="w-4 h-4 mr-2" />
+                        Code
+                      </a>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="flex-1 border-emerald-500/50 text-emerald-400 hover:bg-emerald-950 hover:text-emerald-300"
+                    >
+                      <a href={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Live Demo
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+        </AnimatePresence>
+
+        {/* Resume Dialog */}
+        <Dialog open={isResumeOpen} onOpenChange={setIsResumeOpen}>
+            <MotionDialogContent
+              className="max-w-[95vw] sm:max-w-4xl h-[85vh] p-0 bg-slate-900 border border-slate-700 overflow-hidden flex flex-col"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            >
+              <DialogHeader className="px-4 py-3 border-b border-slate-800 bg-slate-900/50 flex flex-row items-center justify-between">
+                 <DialogTitle className="text-lg font-semibold text-white pl-2">Resume Preview</DialogTitle>
+                 <div className="flex gap-2">
+                    <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                        <a href={RESUME_URL} download="Rion_Kudo_Resume.pdf">
+                            <Download className="w-4 h-4 mr-2" />
+                            Download
+                        </a>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsResumeOpen(false)}
+                        className="text-slate-400 hover:text-white"
+                    >
+                        <X className="h-5 w-5" />
+                    </Button>
+                </div>
               </DialogHeader>
 
-              <div className="space-y-4">
-                <Image
-                  src={selectedProject.image || "/placeholder.svg"}
-                  alt={selectedProject.title}
-                  width={600}
-                  height={400}
-                  className="w-full h-48 sm:h-64 object-cover rounded-lg"
-                />
-
-                <div className="flex flex-wrap gap-2">
-                  {selectedProject.techStack.map((tech) => (
-                    <Badge
-                      key={tech}
-                      variant="secondary"
-                      className="bg-emerald-500/20 text-emerald-300 border-emerald-400/30"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-
-                <p className="text-slate-300 leading-relaxed text-sm lg:text-base">
-                  {selectedProject.description}
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
-                  <Button asChild className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white">
-                    <a href={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer">
-                      <Github className="w-4 h-4 mr-2" />
-                      View Code
-                    </a>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="flex-1 border-emerald-400/50 text-emerald-400 hover:bg-emerald-400/10 bg-transparent"
-                  >
-                    <a href={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Live Demo
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </AnimatePresence>
-
-      {/* Resume dialog */}
-        <Dialog open={isResumeOpen} onOpenChange={setIsResumeOpen}>
-          <MotionDialogContent
-            className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 m-4
-                      data-[state=open]:animate-none data-[state=closed]:animate-none"
-            initial={{ opacity: 0, x: -150 }}   // ⬅️ start left
-            animate={{ opacity: 1, x: 0 }}      // ⬅️ center
-            exit={{ opacity: 0, x: -150 }}      // ⬅️ slide back out left
-            transition={{ type: "spring", stiffness: 260, damping: 25 }}
-          >
-            <DialogHeader>
-              <DialogTitle className="flex items-center justify-between text-white pr-8">
-                <span className="text-lg lg:text-xl">Resume</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsResumeOpen(false)}
-                  className="h-6 w-6 p-0 text-slate-400 hover:text-emerald-400 absolute right-4 top-4"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </DialogTitle>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div className="w-full h-[70vh]">
+              <div className="flex-1 w-full bg-slate-800 overflow-hidden relative">
                 <iframe
-                  src={RESUME_URL}
-                  className="w-full h-full rounded-lg border border-slate-700"
+                    src={RESUME_URL}
+                    className="w-full h-full"
+                    style={{ border: "none" }}
                 />
               </div>
+            </MotionDialogContent>
+        </Dialog>
 
-              <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                <a href={RESUME_URL} download="Rion_Kudo_Resume.pdf">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download PDF
-                </a>
-              </Button>
-            </div>
-          </MotionDialogContent>
-</Dialog>
-
-    </div>
+      </div>
+    </>
   )
 }

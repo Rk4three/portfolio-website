@@ -26,6 +26,9 @@ import {
   Check,
   Download,
   FileText,
+  Cloud,
+  Brush,
+  Settings,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -112,14 +115,20 @@ const techCategories = [
   },
   {
     title: "Styling & Tooling",
-    icon: <Wrench className="w-5 h-5" />,
+    icon: <Brush className="w-5 h-5" />,
     skills: ["Tailwind CSS", "Shadcn/ui"],
   },
   {
-    title: "Databases & Cloud",
+    title: "Databases",
     icon: <Database className="w-5 h-5" />,
-    skills: ["MySQL", "PostgreSQL", "Supabase", "DigitalOcean", "Vercel", "Railway"],
+    skills: ["MySQL", "PostgreSQL", "Supabase"],
   },
+  {
+    title: "Cloud",
+    icon: <Cloud className="w-5 h-5" />,
+    skills: ["DigitalOcean", "Vercel", "Railway"],
+  },
+  
   {
     title: "Developer Tools",
     icon: <Wrench className="w-5 h-5" />,
@@ -127,7 +136,7 @@ const techCategories = [
   },
   {
     title: "APIs & Services",
-    icon: <Wrench className="w-5 h-5" />,
+    icon: <Settings className="w-5 h-5" />,
     skills: ["Groq AI", "Deepgram"],
   },
 ]

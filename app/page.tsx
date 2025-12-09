@@ -128,7 +128,7 @@ const techCategories = [
     icon: <Cloud className="w-5 h-5" />,
     skills: ["DigitalOcean", "Vercel", "Railway"],
   },
-  
+
   {
     title: "Developer Tools",
     icon: <Wrench className="w-5 h-5" />,
@@ -499,45 +499,65 @@ export default function Portfolio() {
                 </div>
               </motion.section>
 
+              {/* Personal Projects */}
               <motion.section variants={itemVariants}>
                 <motion.h2 className="text-2xl sm:text-3xl font-bold mb-6 lg:mb-8 text-slate-200">
                   Personal Projects
                 </motion.h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {projects.map((project, index) => (
+                  {projects.map((project) => (
                     <motion.div
                       key={project.id}
                       variants={itemVariants}
                       whileHover={{ scale: 1.03, y: -8 }}
                       whileTap={{ scale: 0.98 }}
-                      className="group cursor-pointer"
+                      className="group cursor-pointer h-full"
                       onClick={() => setSelectedProject(project)}
                     >
-                      <Card className="overflow-hidden bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 group-hover:border-emerald-400/30 transition-all duration-500 group-hover:shadow-xl group-hover:shadow-emerald-400/10">
-                        <div className="relative overflow-hidden">
-                          <Image
-                            src={project.image || "/placeholder.svg"}
-                            alt={project.title}
-                            width={400}
-                            height={300}
-                            className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <motion.div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          <motion.div
-                            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100"
-                            initial={{ scale: 0 }}
-                            whileHover={{ scale: 1 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <ExternalLink className="w-5 h-5 text-emerald-400" />
-                          </motion.div>
-                        </div>
-                        <CardContent className="p-4 lg:p-6">
-                          <h3 className="text-lg lg:text-xl font-semibold mb-3 text-white group-hover:text-emerald-400 transition-colors duration-300">
+                      <Card className="h-full flex flex-col overflow-hidden bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 group-hover:border-emerald-400/30 transition-all duration-500 group-hover:shadow-xl group-hover:shadow-emerald-400/10">
+                        
+                        {/* 
+                           UPDATE: 
+                           1. Top padding reduced further to pt-1.
+                           2. Bottom padding increased to pb-3 to match the mb-3 of the stack/image gaps.
+                        */}
+                        <CardContent className="flex-1 flex flex-col px-4 lg:px-6 pt-1 pb-3">
+                          
+                          {/* 
+                             UPDATE: 
+                             Title bottom margin increased to mb-3.
+                          */}
+                          <h3 className="text-lg lg:text-xl font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300 mb-3">
                             {project.title}
                           </h3>
+
+                          {/* 
+                             UPDATE: 
+                             Image bottom margin increased to mb-3.
+                             This ensures spacing between Image and Stack is similar to spacing between Title and Image.
+                          */}
+                          <div className="relative overflow-hidden rounded-lg mb-3">
+                            <Image
+                              src={project.image || "/placeholder.svg"}
+                              alt={project.title}
+                              width={400}
+                              height={300}
+                              className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <motion.div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <motion.div
+                              className="absolute top-4 right-4 opacity-0 group-hover:opacity-100"
+                              initial={{ scale: 0 }}
+                              whileHover={{ scale: 1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <ExternalLink className="w-5 h-5 text-emerald-400" />
+                            </motion.div>
+                          </div>
+
                           <div className="flex flex-wrap gap-2">
-                            {project.techStack.map((tech, techIndex) => (
+                            {project.techStack.map((tech) => (
                               <Badge
                                 key={tech}
                                 variant="outline"
@@ -553,6 +573,7 @@ export default function Portfolio() {
                   ))}
                 </div>
               </motion.section>
+
 
               <motion.footer variants={itemVariants} className="text-center py-6 lg:py-8">
                 <motion.p className="text-slate-400 text-sm lg:text-base">

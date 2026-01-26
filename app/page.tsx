@@ -227,12 +227,13 @@ const internshipProjects: Project[] = [
     title: "MP3 Streamer",
     image: "/placeholder.svg",
     techStack: [
+      "Javascript",
       "PHP",
       "MsSQL",
       "Tailwind CSS",
     ],
     description:
-      "Developed an internal inventory management system for tracking assets, supplies, and equipment. Features include barcode scanning, automated low-stock alerts, and comprehensive reporting dashboards.",
+      "This is a portfolio project demonstrating a full-stack web application built with PHP and vanilla JavaScript that provides centralized music streaming and device management capabilities. The application can stream MP3 audio to multiple connected client devices simultaneously, create and manage custom playlists, schedule automated audio chimes for specific times, and provide real-time control over connected playback devices through an elegant dark-themed interface with synchronized state management across all clients.",
     githubUrl: "#",
     liveUrl: "#",
   },
@@ -246,7 +247,7 @@ const internshipProjects: Project[] = [
       "Tailwind CSS",
     ],
     description:
-      "Built a web-based scheduling system for managing employee shifts, time-off requests, and duty assignments. Includes real-time notifications and calendar integration.",
+      "This is a portfolio project demonstrating a full-stack web application designed to streamline internal procurement and approval workflows. The application allows staff to efficiently submit and track item requests, enforces strict department-based approval logic, and generates automated PDF reports for seamless record-keeping.",
     githubUrl: "#",
     liveUrl: "#",
   },
@@ -260,7 +261,7 @@ const internshipProjects: Project[] = [
       "Tailwind CSS",
     ],
     description:
-      "Created an automated document processing pipeline that extracts data from scanned documents using OCR, validates information, and stores structured data for reporting and analysis.",
+      "This is a portfolio project demonstrating a full-stack web application that digitizes facility management workflows. The application enables duty managers to complete interactive daily checklists, manage complex shift schedules with conflict resolution, and track operational history in real-time. Built with PHP and Microsoft SQL Server, it features a modern, responsive Tailwind CSS interface designed for high usability and operational efficiency.",
     githubUrl: "#",
     liveUrl: "#",
   },

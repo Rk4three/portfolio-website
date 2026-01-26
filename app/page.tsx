@@ -160,7 +160,8 @@ interface Project {
   liveUrl: string
 }
 
-const projects: Project[] = [
+// Personal Projects
+const personalProjects: Project[] = [
   {
     id: 1,
     title: "AI Meeting Summarizer",
@@ -216,6 +217,52 @@ const projects: Project[] = [
       "A smart, AI-powered tool that analyzes a resume against a job description to provide an instant compatibility score, highlighting matched skills, identifying gaps, and offering actionable suggestions.",
     githubUrl: "https://github.com/Rk4three/smart-resume-matcher",
     liveUrl: "https://smart-resume-matcher.vercel.app/",
+  },
+]
+
+// Internship Projects
+const internshipProjects: Project[] = [
+  {
+    id: 101,
+    title: "MP3 Streamer",
+    image: "/placeholder.svg",
+    techStack: [
+      "PHP",
+      "MsSQL",
+      "Tailwind CSS",
+    ],
+    description:
+      "Developed an internal inventory management system for tracking assets, supplies, and equipment. Features include barcode scanning, automated low-stock alerts, and comprehensive reporting dashboards.",
+    githubUrl: "#",
+    liveUrl: "#",
+  },
+  {
+    id: 102,
+    title: "Item Request System",
+    image: "/placeholder.svg",
+    techStack: [
+      "PHP",
+      "MsSQL",
+      "Tailwind CSS",
+    ],
+    description:
+      "Built a web-based scheduling system for managing employee shifts, time-off requests, and duty assignments. Includes real-time notifications and calendar integration.",
+    githubUrl: "#",
+    liveUrl: "#",
+  },
+  {
+    id: 103,
+    title: "Manager's Checklist System",
+    image: "/placeholder.svg",
+    techStack: [
+      "PHP",
+      "MsSQL",
+      "Tailwind CSS",
+    ],
+    description:
+      "Created an automated document processing pipeline that extracts data from scanned documents using OCR, validates information, and stores structured data for reporting and analysis.",
+    githubUrl: "#",
+    liveUrl: "#",
   },
 ]
 
@@ -560,50 +607,108 @@ export default function Portfolio() {
                     <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">Projects</h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {projects.map((project) => (
-                    <motion.div
-                      key={project.id}
-                      layoutId={`project-${project.id}`}
-                      whileHover={{ y: -8 }}
-                      onClick={() => setSelectedProject(project)}
-                      className="group cursor-pointer h-full"
-                    >
-                      {/* Removed min-h-[500px] to allow symmetrical height based on content */}
-                      <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
-                        <CardContent className="flex-1 flex flex-col p-0">
-                          
-                          <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
-                             <Image
-                                src={project.image || "/placeholder.svg"}
-                                alt={project.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                             />
-                             <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
-                          </div>
+                {/* Personal Projects */}
+                <div className="mb-12">
+                  <h3 className="text-xl font-semibold text-emerald-400 mb-6 flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5" />
+                    Personal Projects
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {personalProjects.map((project) => (
+                      <motion.div
+                        key={project.id}
+                        layoutId={`project-${project.id}`}
+                        whileHover={{ y: -8 }}
+                        onClick={() => setSelectedProject(project)}
+                        className="group cursor-pointer h-full"
+                      >
+                        <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
+                          <CardContent className="flex-1 flex flex-col p-0">
+                            
+                            <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
+                               <Image
+                                  src={project.image || "/placeholder.svg"}
+                                  alt={project.title}
+                                  fill
+                                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                               />
+                               <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
+                            </div>
 
-                          <div className="p-5 flex flex-col flex-1">
-                              <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
-                                  {project.title}
-                              </h3>
+                            <div className="p-5 flex flex-col flex-1">
+                                <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
+                                    {project.title}
+                                </h3>
 
-                              <div className="flex flex-wrap gap-2 mt-4">
-                                {project.techStack.map((tech) => (
-                                  <Badge
-                                    key={tech}
-                                    variant="outline"
-                                    className="text-xs py-1 px-2 border-slate-700 text-slate-400 group-hover:border-emerald-500/30 group-hover:text-emerald-300"
-                                  >
-                                    {tech}
-                                  </Badge>
-                                ))}
-                              </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                  {project.techStack.map((tech) => (
+                                    <Badge
+                                      key={tech}
+                                      variant="outline"
+                                      className="text-xs py-1 px-2 border-slate-700 text-slate-400 group-hover:border-emerald-500/30 group-hover:text-emerald-300"
+                                    >
+                                      {tech}
+                                    </Badge>
+                                  ))}
+                                </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Internship Projects */}
+                <div>
+                  <h3 className="text-xl font-semibold text-emerald-400 mb-6 flex items-center gap-2">
+                    <Wrench className="w-5 h-5" />
+                    Internship Projects
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {internshipProjects.map((project) => (
+                      <motion.div
+                        key={project.id}
+                        layoutId={`project-${project.id}`}
+                        whileHover={{ y: -8 }}
+                        onClick={() => setSelectedProject(project)}
+                        className="group cursor-pointer h-full"
+                      >
+                        <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
+                          <CardContent className="flex-1 flex flex-col p-0">
+                            
+                            <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
+                               <Image
+                                  src={project.image || "/placeholder.svg"}
+                                  alt={project.title}
+                                  fill
+                                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                               />
+                               <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
+                            </div>
+
+                            <div className="p-5 flex flex-col flex-1">
+                                <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
+                                    {project.title}
+                                </h3>
+
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                  {project.techStack.map((tech) => (
+                                    <Badge
+                                      key={tech}
+                                      variant="outline"
+                                      className="text-xs py-1 px-2 border-slate-700 text-slate-400 group-hover:border-emerald-500/30 group-hover:text-emerald-300"
+                                    >
+                                      {tech}
+                                    </Badge>
+                                  ))}
+                                </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </motion.section>
 

@@ -223,7 +223,7 @@ const techCategories = [
   {
     title: "Languages & Frameworks",
     icon: <Code className="w-5 h-5" />,
-    skills: ["HTML", "CSS", "JavaScript/TypeScript", "React", "Python"],
+    skills: ["HTML", "CSS", "JavaScript/TypeScript", "React", "Python", "PHP"],
   },
   {
     title: "Styling & Tooling",
@@ -233,7 +233,7 @@ const techCategories = [
   {
     title: "Databases",
     icon: <Database className="w-5 h-5" />,
-    skills: ["MySQL", "PostgreSQL", "Supabase"],
+    skills: ["MySQL", "MS SQL","PostgreSQL", "Supabase"],
   },
   {
     title: "Cloud",

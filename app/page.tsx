@@ -254,7 +254,7 @@ const internshipProjects: Project[] = [
   {
     id: 103,
     title: "Manager's Checklist System",
-    image: "/placeholder.svg",
+    image: "/lrn-project-3.png",
     techStack: [
       "PHP",
       "MsSQL",
@@ -262,8 +262,8 @@ const internshipProjects: Project[] = [
     ],
     description:
       "This is a portfolio project demonstrating a full-stack web application that digitizes facility management workflows. The application enables duty managers to complete interactive daily checklists, manage complex shift schedules with conflict resolution, and track operational history in real-time. Built with PHP and Microsoft SQL Server, it features a modern, responsive Tailwind CSS interface designed for high usability and operational efficiency.",
-    githubUrl: "#",
-    liveUrl: "#",
+    githubUrl: "https://github.com/Rk4three/lrn-manager-duties",
+    liveUrl: "https://manager-duties-app.onrender.com/login.php",
   },
 ]
 
@@ -271,7 +271,7 @@ const techCategories = [
   {
     title: "Languages & Frameworks",
     icon: <Code className="w-5 h-5" />,
-    skills: ["HTML", "CSS", "JavaScript/TypeScript", "React", "Python", "PHP"],
+    skills: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Node.js", "Python", "PHP"],
   },
   {
     title: "Styling & Tooling",
@@ -286,7 +286,7 @@ const techCategories = [
   {
     title: "Cloud",
     icon: <Cloud className="w-5 h-5" />,
-    skills: ["DigitalOcean", "Vercel", "Railway"],
+    skills: ["DigitalOcean", "Vercel", "Render"],
   },
   {
     title: "Developer Tools",

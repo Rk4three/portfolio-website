@@ -153,7 +153,7 @@ function MeteorBackground() {
 interface Project {
   id: number
   title: string
-  image: string
+  image?: string
   techStack: string[]
   description: string
   githubUrl: string
@@ -225,7 +225,6 @@ const internshipProjects: Project[] = [
   {
     id: 101,
     title: "MP3 Streamer",
-    image: "/placeholder.svg",
     techStack: [
       "Javascript",
       "PHP",
@@ -240,7 +239,6 @@ const internshipProjects: Project[] = [
   {
     id: 102,
     title: "Item Request System",
-    image: "/placeholder.svg",
     techStack: [
       "PHP",
       "MsSQL",
@@ -626,15 +624,17 @@ export default function Portfolio() {
                         <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
                           <CardContent className="flex-1 flex flex-col p-0">
                             
+                            {project.image && (
                             <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
                                <Image
-                                  src={project.image || "/placeholder.svg"}
+                                  src={project.image}
                                   alt={project.title}
                                   fill
                                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                                />
                                <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
                             </div>
+                            )}
 
                             <div className="p-5 flex flex-col flex-1">
                                 <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
@@ -678,15 +678,17 @@ export default function Portfolio() {
                         <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
                           <CardContent className="flex-1 flex flex-col p-0">
                             
+                            {project.image && (
                             <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
                                <Image
-                                  src={project.image || "/placeholder.svg"}
+                                  src={project.image}
                                   alt={project.title}
                                   fill
                                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                                />
                                <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
                             </div>
+                            )}
 
                             <div className="p-5 flex flex-col flex-1">
                                 <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
@@ -743,14 +745,16 @@ export default function Portfolio() {
                 </DialogHeader>
 
                 <div className="p-6 space-y-6">
+                  {selectedProject.image && (
                   <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/50 shadow-lg">
                     <Image
-                      src={selectedProject.image || "/placeholder.svg"}
+                      src={selectedProject.image}
                       alt={selectedProject.title}
                       fill
                       className="object-cover"
                     />
                   </div>
+                  )}
 
                   <div className="flex flex-wrap gap-2">
                     {selectedProject.techStack.map((tech) => (

@@ -225,6 +225,7 @@ const internshipProjects: Project[] = [
   {
     id: 101,
     title: "MP3 Streamer",
+    image: "/lrn-project-1.png",
     techStack: [
       "Javascript",
       "PHP",
@@ -233,12 +234,13 @@ const internshipProjects: Project[] = [
     ],
     description:
       "This is a portfolio project demonstrating a full-stack web application built with PHP and vanilla JavaScript that provides centralized music streaming and device management capabilities. The application can stream MP3 audio to multiple connected client devices simultaneously, create and manage custom playlists, schedule automated audio chimes for specific times, and provide real-time control over connected playback devices through an elegant dark-themed interface with synchronized state management across all clients.",
-    githubUrl: "#",
-    liveUrl: "#",
+    githubUrl: "https://github.com/Rk4three/lrn-mp3-streamer",
+    liveUrl: "https://lrn-mp3-streamer.onrender.com",
   },
   {
     id: 102,
     title: "Item Request System",
+    image: "/lrn-project-2.png",
     techStack: [
       "PHP",
       "MsSQL",
@@ -246,8 +248,8 @@ const internshipProjects: Project[] = [
     ],
     description:
       "This is a portfolio project demonstrating a full-stack web application designed to streamline internal procurement and approval workflows. The application allows staff to efficiently submit and track item requests, enforces strict department-based approval logic, and generates automated PDF reports for seamless record-keeping.",
-    githubUrl: "#",
-    liveUrl: "#",
+    githubUrl: "https://github.com/Rk4three/lrn-item-request",
+    liveUrl: "https://lrn-item-request.onrender.com",
   },
   {
     id: 103,

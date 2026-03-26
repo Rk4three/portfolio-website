@@ -387,6 +387,12 @@ export default function Home() {
                 <li className="text-sm text-white/35 leading-relaxed">
                   Implemented a duty manager scheduling system with shift-based calendar and photo-upload verification.
                 </li>
+                <li className="text-sm text-white/35 leading-relaxed">
+                  Developed a Python automation script to execute the 2–3 startup commands required to bring the internal server online, eliminating full service outages during IT staff absence or post-update restarts and saving +$100/year in Termius Pro licensing costs.
+                </li>
+                <li className="text-sm text-white/35 leading-relaxed">
+                  Built a real-time employee attendance system integrating Hikvision face-recognition terminals with a Node.js WebSocket server, processing live scan events for 1,000+ employees to track event headcount and token/treat claims with zero manual tallying.
+                </li>
               </ul>
             </div>
 

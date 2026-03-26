@@ -1,182 +1,33 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import {
-  Github,
-  Linkedin,
-  Mail,
-  ExternalLink,
-  X,
-  Code,
-  Database,
-  Wrench,
-  Brain,
-  Users,
-  Lightbulb,
-  Target,
-  Shield,
-  Zap,
-  MapPin,
-  Copy,
-  Check,
-  Download,
-  FileText,
-  Cloud,
-  Brush,
-  Settings,
-} from "lucide-react"
+import { useState, useRef, useEffect, useCallback } from "react"
+import { motion, useInView, AnimatePresence } from "framer-motion"
+import { Github, Linkedin, Mail, Download, Menu, X, ArrowRight } from "lucide-react"
 import Image from "next/image"
+import SectionHeading from "@/components/SectionHeading"
+import AnimatedSection from "@/components/AnimatedSection"
+import HorizontalScroll from "@/components/HorizontalScroll"
+import ProjectFrame from "@/components/ProjectFrame"
 
-const MotionDialogContent = motion(DialogContent as any)
-
-// ──────────────────────────────────────
-// Emerald Meteor Background Component
-// ──────────────────────────────────────
-function MeteorBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
-
-    interface Meteor {
-      x: number
-      y: number
-      speed: number
-      length: number
-      thickness: number
-      opacity: number
-    }
-
-    const meteors: Meteor[] = []
-    const meteorCount = 20 
-
-    const spawnMeteor = (init = false): Meteor => {
-      let startX, startY;
-      
-      if (init) {
-        startX = Math.random() * canvas.width * 1.5 - canvas.width * 0.2
-        startY = Math.random() * canvas.height * 1.5 - canvas.height * 0.5
-      } else {
-        if (Math.random() > 0.5) {
-          startX = Math.random() * canvas.width * 1.5 
-          startY = -100 - Math.random() * 100
-        } else {
-          startX = canvas.width + 100 + Math.random() * 100
-          startY = Math.random() * canvas.height * 1.2 - canvas.height * 0.2
-        }
-      }
-
-      return {
-        x: startX,
-        y: startY,
-        speed: 2 + Math.random() * 3, 
-        length: 100 + Math.random() * 80,
-        thickness: 1 + Math.random() * 1.5,
-        opacity: 0.4 + Math.random() * 0.4,
-      }
-    }
-
-    for (let i = 0; i < meteorCount; i++) {
-      meteors.push(spawnMeteor(true))
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      meteors.forEach((m, index) => {
-        const tailX = m.x + m.length
-        const tailY = m.y - m.length
-
-        const gradient = ctx.createLinearGradient(m.x, m.y, tailX, tailY)
-        gradient.addColorStop(0, `rgba(255, 255, 255, ${m.opacity})`)
-        gradient.addColorStop(0.1, `rgba(16, 185, 129, ${m.opacity})`)
-        gradient.addColorStop(1, "rgba(16, 185, 129, 0)")
-
-        ctx.strokeStyle = gradient
-        ctx.lineWidth = m.thickness
-        ctx.lineCap = "round"
-        ctx.beginPath()
-        ctx.moveTo(m.x, m.y)
-        ctx.lineTo(tailX, tailY)
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.arc(m.x, m.y, m.thickness * 1.5, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(255, 255, 255, ${m.opacity})`
-        ctx.shadowBlur = 10
-        ctx.shadowColor = "rgba(16, 185, 129, 1)"
-        ctx.fill()
-        ctx.shadowBlur = 0 
-
-        m.x -= m.speed
-        m.y += m.speed
-
-        if (m.x < -200 || m.y > canvas.height + 200) {
-          meteors[index] = spawnMeteor()
-        }
-      })
-
-      requestAnimationFrame(animate)
-    }
-
-    animate()
-
-    return () => {
-      window.removeEventListener("resize", resizeCanvas)
-    }
-  }, [])
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{ mixBlendMode: "screen" }} 
-    />
-  )
-}
-
+// ─── Data ────────────────────────────────────
 interface Project {
   id: number
   title: string
-  image?: string
+  image: string
   techStack: string[]
   description: string
   githubUrl: string
   liveUrl: string
 }
 
-// Personal Projects
-const personalProjects: Project[] = [
+const allProjects: Project[] = [
   {
     id: 1,
     title: "AI Meeting Summarizer",
     image: "/project-1.png",
-    techStack: [
-      "React",
-      "TypeScript",
-      "Tailwind CSS",
-      "Shadcn/ui",
-      "Vercel (edge)",
-      "Groq AI",
-      "Deepgram",
-    ],
+    techStack: ["React", "TypeScript", "Groq AI", "Deepgram"],
     description:
-      "This is a portfolio project demonstrating a full-stack web application that leverages AI to enhance meeting productivity. The application can transcribe audio from meetings, identify speakers, and generate actionable summaries.",
+      "Transcribes meeting audio into structured summaries with identified speakers and extracted action items. Processes a 30-second recording in ~10 seconds end-to-end.",
     githubUrl: "https://github.com/Rk4three/ai-meeting-summarizer",
     liveUrl: "https://ai-meeting-summarizer-gray-seven.vercel.app/",
   },
@@ -184,17 +35,9 @@ const personalProjects: Project[] = [
     id: 2,
     title: "AI Finance Tracker",
     image: "/project-2.png",
-    techStack: [
-      "TypeScript",
-      "React",
-      "Supabase",
-      "Tailwind CSS",
-      "Shadcn/ui",
-      "Groq AI",
-      "Vercel",
-    ],
+    techStack: ["Next.js", "TypeScript", "Supabase", "Groq AI"],
     description:
-      "A personal finance tracker featuring an AI assistant. Built with React and TypeScript, this app allows users to import transactions via CSV, visualize spending with interactive charts, and ask questions in natural language.",
+      "A personal finance dashboard for tracking transactions across 10+ categories, visualizing spending patterns, and querying finances through natural language.",
     githubUrl: "https://github.com/Rk4three/ai-finance-tracker",
     liveUrl: "https://ai-finance-tracker-steel.vercel.app/",
   },
@@ -202,641 +45,447 @@ const personalProjects: Project[] = [
     id: 3,
     title: "Smart Resume Matcher",
     image: "/project-3.png",
-    techStack: [
-      "Python",
-      "FastAPI",
-      "React",
-      "Supabase",
-      "PostgreSQL",
-      "Railway",
-      "Vercel",
-      "Docker",
-      "Groq AI",
-    ],
+    techStack: ["Python", "FastAPI", "React", "PostgreSQL", "Docker"],
     description:
-      "A smart, AI-powered tool that analyzes a resume against a job description to provide an instant compatibility score, highlighting matched skills, identifying gaps, and offering actionable suggestions.",
+      "Scores resume-to-job-description compatibility using multi-tier skill matching and AI-generated career gap analysis.",
     githubUrl: "https://github.com/Rk4three/smart-resume-matcher",
     liveUrl: "https://smart-resume-matcher.vercel.app/",
   },
-]
-
-// Internship Projects
-const internshipProjects: Project[] = [
   {
-    id: 101,
+    id: 4,
     title: "MP3 Streamer",
     image: "/lrn-project-1.png",
-    techStack: [
-      "Javascript",
-      "PHP",
-      "MsSQL",
-      "Tailwind CSS",
-    ],
+    techStack: ["JavaScript", "PHP", "MS SQL", "Tailwind CSS"],
     description:
-      "This is a portfolio project demonstrating a full-stack web application built with PHP and vanilla JavaScript that provides centralized music streaming and device management capabilities. The application can stream MP3 audio to multiple connected client devices simultaneously, create and manage custom playlists, schedule automated audio chimes for specific times, and provide real-time control over connected playback devices through an elegant dark-themed interface with synchronized state management across all clients.",
+      "Synchronized audio broadcast system streaming to 10+ rooms simultaneously with 1-second polling and server-side latency compensation.",
     githubUrl: "https://github.com/Rk4three/lrn-mp3-streamer",
     liveUrl: "https://lrn-mp3-streamer.onrender.com",
   },
   {
-    id: 102,
+    id: 5,
     title: "Item Request System",
     image: "/lrn-project-2.png",
-    techStack: [
-      "PHP",
-      "MsSQL",
-      "Tailwind CSS",
-    ],
+    techStack: ["PHP", "MS SQL", "Tailwind CSS"],
     description:
-      "This is a portfolio project demonstrating a full-stack web application designed to streamline internal procurement and approval workflows. The application allows staff to efficiently submit and track item requests, enforces strict department-based approval logic, and generates automated PDF reports for seamless record-keeping.",
+      "Role-based item request approval workflow processing 1,000+ requests across 20+ departments with automated PDF reports.",
     githubUrl: "https://github.com/Rk4three/lrn-item-request",
     liveUrl: "https://lrn-item-request.onrender.com",
   },
   {
-    id: 103,
+    id: 6,
     title: "Manager's Checklist System",
     image: "/lrn-project-3.png",
-    techStack: [
-      "PHP",
-      "MsSQL",
-      "Tailwind CSS",
-    ],
+    techStack: ["PHP", "MS SQL", "Tailwind CSS"],
     description:
-      "This is a portfolio project demonstrating a full-stack web application that digitizes facility management workflows. The application enables duty managers to complete interactive daily checklists, manage complex shift schedules with conflict resolution, and track operational history in real-time. Built with PHP and Microsoft SQL Server, it features a modern, responsive Tailwind CSS interface designed for high usability and operational efficiency.",
+      "Duty manager scheduling system with shift-based calendar, photo-upload task verification, and auto-submission logic.",
     githubUrl: "https://github.com/Rk4three/lrn-manager-duties",
     liveUrl: "https://manager-duties-app.onrender.com/login.php",
   },
 ]
 
-const techCategories = [
-  {
-    title: "Languages & Frameworks",
-    icon: <Code className="w-5 h-5" />,
-    skills: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Node.js", "Python", "PHP"],
-  },
-  {
-    title: "Styling & Tooling",
-    icon: <Brush className="w-5 h-5" />,
-    skills: ["Tailwind CSS", "Shadcn/ui"],
-  },
-  {
-    title: "Databases",
-    icon: <Database className="w-5 h-5" />,
-    skills: ["MySQL", "MS SQL","PostgreSQL", "Supabase"],
-  },
-  {
-    title: "Cloud",
-    icon: <Cloud className="w-5 h-5" />,
-    skills: ["DigitalOcean", "Vercel", "Render"],
-  },
-  {
-    title: "Developer Tools",
-    icon: <Wrench className="w-5 h-5" />,
-    skills: ["Git", "GitHub", "Docker", "VS Code"],
-  },
-  {
-    title: "APIs & Services",
-    icon: <Settings className="w-5 h-5" />,
-    skills: ["Groq AI", "Deepgram"],
-  },
-]
-
-const softSkills = [
-  { name: "Problem-Solving", icon: <Target className="w-4 h-4" /> },
-  { name: "Adaptability", icon: <Zap className="w-4 h-4" /> },
-  { name: "Creative Thinking", icon: <Lightbulb className="w-4 h-4" /> },
-  { name: "Collaboration", icon: <Users className="w-4 h-4" /> },
-  { name: "Self-Discipline", icon: <Shield className="w-4 h-4" /> },
-  { name: "Resilience", icon: <Brain className="w-4 h-4" /> },
+const skillCategories = [
+  { title: "Languages", skills: ["JavaScript", "TypeScript", "Python", "PHP", "HTML", "CSS"] },
+  { title: "Frameworks", skills: ["React", "Next.js", "FastAPI", "Node.js"] },
+  { title: "Databases & Cloud", skills: ["PostgreSQL", "MySQL", "MS SQL", "Supabase", "Vercel", "Render", "DigitalOcean"] },
+  { title: "Tools & APIs", skills: ["Git", "Docker", "Groq AI", "Deepgram"] },
 ]
 
 const RESUME_URL = "/Rion_Kudo_Resume.pdf"
 
-const contactInfo = [
-  {
-    type: "email",
-    label: "Email",
-    value: "rioncal@gmail.com",
-    icon: <Mail className="w-5 h-5" />,
-    href: "mailto:rioncal@gmail.com",
-  },
-  {
-    type: "github",
-    label: "GitHub",
-    value: "github.com/Rk4three",
-    icon: <Github className="w-5 h-5" />,
-    href: "https://github.com/Rk4three",
-  },
-  {
-    type: "linkedin",
-    label: "LinkedIn",
-    value: "linkedin.com/in/rion-kudo",
-    icon: <Linkedin className="w-5 h-5" />,
-    href: "https://www.linkedin.com/in/rion-kudo-a6ab76248/",
-  },
-  {
-    type: "resume",
-    label: "Resume",
-    value: "",
-    icon: <FileText className="w-5 h-5" />,
-    href: RESUME_URL,
-  },
+const sectionIds = ["work", "about", "experience", "skills", "contact"]
+
+const navLinks = [
+  { label: "Work", href: "#work" },
+  { label: "About", href: "#about" },
+  { label: "Skills", href: "#skills" },
+  { label: "Contact", href: "#contact" },
 ]
 
-export default function Portfolio() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const [copiedContact, setCopiedContact] = useState<string | null>(null)
-  const [isResumeOpen, setIsResumeOpen] = useState(false)
+const ease = [0.22, 1, 0.36, 1] as const
 
+// ─── Page ────────────────────────────────────
+export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState("")
+  const heroRef = useRef(null)
+  const heroInView = useInView(heroRef, { once: true })
+
+  // Escape key closes mobile menu
   useEffect(() => {
-    setIsVisible(true)
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false)
+    }
+    document.addEventListener("keydown", handleKey)
+    return () => document.removeEventListener("keydown", handleKey)
   }, [])
 
-  const copyToClipboard = async (text: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopiedContact(type)
-      setTimeout(() => setCopiedContact(null), 2000)
-    } catch (err) {
-      console.error("Failed to copy text: ", err)
-    }
-  }
+  // Active nav highlighting via Intersection Observer
+  useEffect(() => {
+    const observers: IntersectionObserver[] = []
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id)
+      if (!el) return
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveSection(id)
+        },
+        { rootMargin: "-40% 0px -40% 0px" }
+      )
+      observer.observe(el)
+      observers.push(observer)
+    })
+    return () => observers.forEach((o) => o.disconnect())
+  }, [])
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
-  }
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } },
-  }
+  const isActive = useCallback(
+    (href: string) => href === `#${activeSection}`,
+    [activeSection]
+  )
 
   return (
-    <>
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(16, 185, 129, 0.2);
-          border-radius: 20px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: rgba(16, 185, 129, 0.5);
-        }
-      `}</style>
-
-      <div className="h-screen bg-[#0b1a1f] text-white overflow-hidden relative font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
-        
-        <MeteorBackground />
-
-        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
-            <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-emerald-900/10 rounded-full blur-[120px]" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] bg-blue-900/10 rounded-full blur-[100px]" />
+    <main className="bg-black text-white min-h-screen">
+      {/* ─── Nav ─────────────────────────────── */}
+      <motion.nav
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease, delay: 0.05 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/[0.04]"
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 h-14 flex items-center justify-between">
+          <a href="#" className="text-sm font-semibold tracking-tight">
+            RION KUDO
+          </a>
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className={`relative font-mono text-[11px] tracking-[2px] uppercase transition-colors py-2 ${
+                  isActive(link.href) ? "text-white/70" : "text-white/30 hover:text-white/60"
+                }`}
+              >
+                {link.label}
+                <span
+                  className={`absolute bottom-0 left-0 h-px bg-[#8b5cf6] transition-all duration-300 ${
+                    isActive(link.href) ? "w-full" : "w-0"
+                  }`}
+                />
+              </a>
+            ))}
+          </div>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden p-2 -mr-2 text-white/50 hover:text-white transition-colors"
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
 
-        <motion.div
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
-          variants={containerVariants}
-          className="relative z-10 h-full flex flex-col lg:flex-row"
-        >
-          
-          {/* Sidebar */}
-          <motion.div
-            variants={itemVariants}
-            className="
-              w-full lg:w-80 shrink-0 
-              bg-slate-900/80 backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-slate-700/50 
-              flex flex-col lg:h-full z-20 shadow-2xl
-            "
-          >
-            <div className="p-6 lg:p-8 flex flex-col justify-center h-full overflow-y-auto custom-scrollbar">
-                
-                <motion.div
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-                className="relative mb-6 mx-auto"
-                >
-                <div className="w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 relative group">
-                    <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl group-hover:bg-emerald-500/30 transition-all duration-500" />
-                    
-                    <Image
-                    src="/rion-kudo-picture.jpg"
-                    alt="Rion Kudo"
-                    width={160}
-                    height={160}
-                    className="relative z-10 rounded-2xl shadow-2xl border border-emerald-500/20 w-full h-full object-cover"
-                    />
-                    
-                    <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute -inset-3 rounded-2xl border border-dashed border-emerald-500/30 z-0"
-                    />
-                </div>
-                </motion.div>
-
-                <motion.h1 variants={itemVariants} className="text-2xl lg:text-3xl font-bold text-white mb-2 text-center tracking-tight">
-                Rion Kudo
-                </motion.h1>
-                <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 text-emerald-400 mb-8">
-                <MapPin className="w-3.5 h-3.5" />
-                <span className="text-xs font-medium uppercase tracking-wider">Angeles City, Pampanga</span>
-                </motion.div>
-
-                <motion.div variants={itemVariants} className="space-y-3">
-                {contactInfo.map((contact) => {
-                    const isResume = contact.type === "resume"
-                    return (
-                    <motion.div key={contact.type} whileHover={{ scale: 1.02 }} className="group">
-                        <div
-                        className="bg-slate-800/40 hover:bg-slate-800/80 border border-slate-700/50 hover:border-emerald-500/30 rounded-lg p-3 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
-                        onClick={isResume ? () => setIsResumeOpen(true) : undefined}
-                        >
-                        <div className="flex items-center justify-between">
-                            {isResume ? (
-                            <div className="flex flex-1 items-center justify-center gap-3">
-                                <div className="text-emerald-400 group-hover:scale-110 transition-transform">
-                                {contact.icon}
-                                </div>
-                                <div className="text-center">
-                                <div className="text-sm font-semibold text-white">View Resume</div>
-                                </div>
-                            </div>
-                            ) : (
-                            <a href={contact.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className="text-emerald-400 group-hover:scale-110 transition-transform">
-                                {contact.icon}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">{contact.label}</div>
-                                <div className="text-slate-200 text-sm font-medium truncate">{contact.value}</div>
-                                </div>
-                            </a>
-                            )}
-                            {!isResume && (
-                            <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                e.stopPropagation()
-                                copyToClipboard(contact.value, contact.type)
-                                }}
-                                className="text-slate-500 hover:text-emerald-400 transition-colors p-1.5"
-                            >
-                                {copiedContact === contact.type ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                            </motion.button>
-                            )}
-                        </div>
-                        </div>
-                    </motion.div>
-                    )
-                })}
-                </motion.div>
-
-                <motion.div variants={itemVariants} className="mt-8 flex items-center justify-center gap-2.5">
-                    <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                    <span className="text-xs font-medium text-emerald-400/90 tracking-wide">Available for Work and Opportunities</span>
-                </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Main Content */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-900/20">
-            <div className="max-w-5xl mx-auto p-4 sm:p-8 lg:p-12 space-y-12 lg:space-y-20 pb-20">
-              
-              {/* About Me */}
-              <motion.section variants={itemVariants}>
-                <div className="mb-6">
-                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">About Me</h2>
-                </div>
-                <motion.div whileHover={{ scale: 1.01 }} className="group">
-                  <Card className="bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/20 transition-all duration-500 shadow-xl">
-                    <CardContent className="p-6 lg:p-8">
-                      <p className="text-base lg:text-lg leading-loose text-slate-300 font-light">
-                        I'm a 4th-year Computer Science student passionate about Artificial Intelligence,
-                        Machine Learning, and software engineering. Skilled in Python, React, and SQL, I
-                        enjoy building projects that turn ideas into practical solutions.
-                        <br /><br />
-                        As I prepare for my internship and future career in tech, I'm eager to apply my
-                        skills in real-world settings, contribute to innovative teams, and continue growing
-                        as a problem-solver.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </motion.section>
-
-              {/* Tech Stack */}
-              <motion.section variants={itemVariants}>
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">Tech Stack</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {techCategories.map((category, index) => (
-                    <motion.div
-                      key={category.title}
-                      variants={itemVariants}
-                      whileHover={{ y: -4 }}
-                      className="group"
-                    >
-                      <Card className="h-full bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/20 transition-all duration-300">
-                        <CardContent className="p-5">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 group-hover:text-emerald-300 group-hover:bg-emerald-500/20 transition-colors">
-                              {category.icon}
-                            </div>
-                            <h3 className="font-semibold text-slate-100">
-                              {category.title}
-                            </h3>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {category.skills.map((skill, skillIndex) => (
-                              <Badge
-                                key={skill}
-                                variant="secondary"
-                                className="bg-slate-800/50 text-slate-300 border-slate-700/50 hover:bg-emerald-500/10 hover:text-emerald-300 hover:border-emerald-500/20 transition-all"
-                              >
-                                {skill}
-                              </Badge>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.section>
-
-              {/* Soft Skills */}
-              <motion.section variants={itemVariants}>
-                 <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">Soft Skills</h2>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                  {softSkills.map((skill, index) => (
-                    <motion.div
-                      key={skill.name}
-                      whileHover={{ scale: 1.05 }}
-                      className="group"
-                    >
-                      <div className="h-full p-4 flex flex-col items-center justify-center text-center bg-slate-900/40 border border-slate-800 rounded-xl hover:border-emerald-500/30 hover:bg-emerald-900/5 transition-all duration-300 cursor-default">
-                          <div className="text-emerald-400 mb-2 group-hover:scale-110 transition-transform">
-                            {skill.icon}
-                          </div>
-                          <span className="text-xs font-medium text-slate-300 group-hover:text-white">
-                            {skill.name}
-                          </span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.section>
-
-              {/* Projects */}
-              <motion.section variants={itemVariants}>
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white tracking-tight pb-2 border-b border-slate-700/60 w-fit">Projects</h2>
-                </div>
-
-                {/* Personal Projects */}
-                <div className="mb-12">
-                  <h3 className="text-xl font-semibold text-emerald-400 mb-6 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5" />
-                    Personal Projects
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {personalProjects.map((project) => (
-                      <motion.div
-                        key={project.id}
-                        layoutId={`project-${project.id}`}
-                        whileHover={{ y: -8 }}
-                        onClick={() => setSelectedProject(project)}
-                        className="group cursor-pointer h-full"
-                      >
-                        <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
-                          <CardContent className="flex-1 flex flex-col p-0">
-                            
-                            {project.image && (
-                            <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
-                               <Image
-                                  src={project.image}
-                                  alt={project.title}
-                                  fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                               />
-                               <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
-                            </div>
-                            )}
-
-                            <div className="p-5 flex flex-col flex-1">
-                                <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
-                                    {project.title}
-                                </h3>
-
-                                <div className="flex flex-wrap gap-2 mt-4">
-                                  {project.techStack.map((tech) => (
-                                    <Badge
-                                      key={tech}
-                                      variant="outline"
-                                      className="text-xs py-1 px-2 border-slate-700 text-slate-400 group-hover:border-emerald-500/30 group-hover:text-emerald-300"
-                                    >
-                                      {tech}
-                                    </Badge>
-                                  ))}
-                                </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Internship Projects */}
-                <div>
-                  <h3 className="text-xl font-semibold text-emerald-400 mb-6 flex items-center gap-2">
-                    <Wrench className="w-5 h-5" />
-                    Internship Projects
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {internshipProjects.map((project) => (
-                      <motion.div
-                        key={project.id}
-                        layoutId={`project-${project.id}`}
-                        whileHover={{ y: -8 }}
-                        onClick={() => setSelectedProject(project)}
-                        className="group cursor-pointer h-full"
-                      >
-                        <Card className="h-full flex flex-col overflow-hidden bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/20">
-                          <CardContent className="flex-1 flex flex-col p-0">
-                            
-                            {project.image && (
-                            <div className="relative w-full h-48 overflow-hidden border-b border-slate-800">
-                               <Image
-                                  src={project.image}
-                                  alt={project.title}
-                                  fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                               />
-                               <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
-                            </div>
-                            )}
-
-                            <div className="p-5 flex flex-col flex-1">
-                                <h3 className="text-xl font-bold text-white mb-0 group-hover:text-emerald-400 transition-colors">
-                                    {project.title}
-                                </h3>
-
-                                <div className="flex flex-wrap gap-2 mt-4">
-                                  {project.techStack.map((tech) => (
-                                    <Badge
-                                      key={tech}
-                                      variant="outline"
-                                      className="text-xs py-1 px-2 border-slate-700 text-slate-400 group-hover:border-emerald-500/30 group-hover:text-emerald-300"
-                                    >
-                                      {tech}
-                                    </Badge>
-                                  ))}
-                                </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </motion.section>
-
-              <motion.footer className="text-center pt-8 border-t border-slate-800/50">
-                <p className="text-slate-500 text-sm">
-                  © {new Date().getFullYear()} Rion Kudo. Built with <span className="text-emerald-500">React</span> & <span className="text-emerald-500">Tailwind</span>.
-                </p>
-              </motion.footer>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Project Dialog */}
+        {/* Mobile menu */}
         <AnimatePresence>
-          {selectedProject && (
-            <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
-              <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900/95 backdrop-blur-xl border border-slate-700 p-0 overflow-hidden shadow-2xl">
-                
-                <DialogHeader className="p-6 pb-0">
-                  <DialogTitle className="flex items-center justify-between text-white">
-                    <span className="text-2xl font-bold text-emerald-400">{selectedProject.title}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedProject(null)}
-                      className="text-slate-400 hover:text-white hover:bg-white/10"
-                    >
-                      <X className="h-5 w-5" />
-                    </Button>
-                  </DialogTitle>
-                </DialogHeader>
-
-                <div className="p-6 space-y-6">
-                  {selectedProject.image && (
-                  <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/50 shadow-lg">
-                    <Image
-                      src={selectedProject.image}
-                      alt={selectedProject.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProject.techStack.map((tech) => (
-                      <Badge
-                        key={tech}
-                        className="bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20"
-                      >
-                        {tech}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <p className="text-slate-300 leading-relaxed text-base">
-                    {selectedProject.description}
-                  </p>
-
-                  <div className="flex gap-4 pt-2">
-                    <Button asChild className="flex-1 bg-white text-slate-900 hover:bg-emerald-50 font-semibold">
-                      <a href={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer">
-                        <Github className="w-4 h-4 mr-2" />
-                        Code
-                      </a>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="flex-1 border-emerald-500/50 text-emerald-400 hover:bg-emerald-950 hover:text-emerald-300"
-                    >
-                      <a href={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Live Demo
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease }}
+              className="md:hidden border-t border-white/[0.04] bg-black/95 backdrop-blur-md overflow-hidden"
+            >
+              <div className="px-6 py-6 flex flex-col gap-1">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="font-mono text-xs tracking-[2px] uppercase text-white/40 hover:text-white/70 transition-colors py-3"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
+      </motion.nav>
 
-        {/* Resume Dialog */}
-        <Dialog open={isResumeOpen} onOpenChange={setIsResumeOpen}>
-            <MotionDialogContent
-              className="max-w-[95vw] sm:max-w-4xl h-[85vh] p-0 bg-slate-900 border border-slate-700 overflow-hidden flex flex-col"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+      {/* ─── Hero (01) ───────────────────────── */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center pt-14">
+        {/* Left accent line */}
+        <div className="absolute left-6 lg:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#8b5cf6]/20 to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
+          <div className="pl-6 lg:pl-10 max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, ease, delay: 0.2 }}
+              className="text-[#8b5cf6] font-mono text-[11px] tracking-[3px] uppercase mb-6"
             >
-              <DialogHeader className="px-4 py-3 border-b border-slate-800 bg-slate-900/50 flex flex-row items-center justify-between">
-                 <DialogTitle className="text-lg font-semibold text-white pl-2">Resume Preview</DialogTitle>
-                 <div className="flex gap-2">
-                    <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                        <a href={RESUME_URL} download="Rion_Kudo_Resume.pdf">
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                        </a>
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsResumeOpen(false)}
-                        className="text-slate-400 hover:text-white"
-                    >
-                        <X className="h-5 w-5" />
-                    </Button>
-                </div>
-              </DialogHeader>
+              Full-stack Developer
+            </motion.div>
 
-              <div className="flex-1 w-full bg-slate-800 overflow-hidden relative">
-                <iframe
-                    src={RESUME_URL}
-                    className="w-full h-full"
-                    style={{ border: "none" }}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.7, ease, delay: 0.35 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+            >
+              I build things that
+              <br />
+              think for themselves.
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, ease, delay: 0.5 }}
+              className="text-sm md:text-base text-white/35 leading-relaxed max-w-md mb-10"
+            >
+              Full-stack developer specializing in React, TypeScript, and
+              AI-powered applications. Turning complex problems into clean,
+              intelligent solutions.
+            </motion.p>
+
+            <motion.a
+              href="#work"
+              initial={{ opacity: 0, y: 12 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, ease, delay: 0.65 }}
+              className="inline-flex items-center gap-3 group"
+            >
+              <span className="w-10 h-10 rounded-full border border-[#8b5cf6]/30 flex items-center justify-center group-hover:border-[#8b5cf6]/60 group-hover:scale-105 transition-all duration-300">
+                <ArrowRight className="w-4 h-4 text-[#8b5cf6]" />
+              </span>
+              <span className="font-mono text-[11px] tracking-[2px] uppercase text-white/30 group-hover:text-white/60 transition-colors">
+                View Work
+              </span>
+            </motion.a>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={heroInView ? { opacity: 1 } : {}}
+          transition={{ delay: 1.2, duration: 0.8 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-px h-8 bg-gradient-to-b from-white/20 to-transparent"
+          />
+        </motion.div>
+      </section>
+
+      {/* ─── Work (02) ───────────────────────── */}
+      <section id="work" className="py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <SectionHeading number="02" title="Selected Work" />
+        </div>
+        <HorizontalScroll>
+          {allProjects.map((project, i) => (
+            <ProjectFrame
+              key={project.id}
+              number={String(i + 1).padStart(2, "0")}
+              total={String(allProjects.length).padStart(2, "0")}
+              title={project.title}
+              description={project.description}
+              stack={project.techStack}
+              githubUrl={project.githubUrl}
+              liveUrl={project.liveUrl}
+              image={project.image}
+              priority={i === 0}
+            />
+          ))}
+        </HorizontalScroll>
+      </section>
+
+      {/* ─── About (03) ──────────────────────── */}
+      <AnimatedSection id="about" className="py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <SectionHeading number="03" title="About" />
+          <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
+            <div className="flex-1 max-w-lg">
+              <p className="text-lg md:text-xl font-light text-white/70 leading-relaxed mb-6">
+                I&apos;m a computer science student at Holy Angel University in the Philippines,
+                graduating April 2026. I gravitate toward building tools that use AI to
+                solve real, everyday problems.
+              </p>
+              <p className="text-sm text-white/35 leading-relaxed mb-8">
+                Most recently, I interned at La Rose Noire as a full-stack developer,
+                where I shipped production systems handling multiple requests across
+                departments. When I&apos;m not coding, you can see me playing a variety of games and some sports such as basketball. I also love collecting toys and TCGs!
+              </p>
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://github.com/Rk4three"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 -m-2 text-white/25 hover:text-white/60 hover:scale-110 transition-all duration-200"
+                  aria-label="GitHub"
+                >
+                  <Github className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://linkedin.com/in/rion-kudo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 -m-2 text-white/25 hover:text-white/60 hover:scale-110 transition-all duration-200"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="w-4 h-4" />
+                </a>
+                <a
+                  href="mailto:Rionkudo3@gmail.com"
+                  className="p-2 -m-2 text-white/25 hover:text-white/60 hover:scale-110 transition-all duration-200"
+                  aria-label="Email"
+                >
+                  <Mail className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+            <div className="flex-shrink-0">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border border-white/[0.08]">
+                <Image
+                  src="/rion-kudo-picture.jpg"
+                  alt="Rion Kudo"
+                  width={112}
+                  height={112}
+                  className="object-cover w-full h-full"
                 />
               </div>
-            </MotionDialogContent>
-        </Dialog>
+            </div>
+          </div>
+        </div>
+      </AnimatedSection>
 
-      </div>
-    </>
+      {/* ─── Experience (04) ─────────────────── */}
+      <AnimatedSection id="experience" className="py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <SectionHeading number="04" title="Experience" />
+
+          <div className="max-w-2xl">
+            {/* Internship */}
+            <div className="border-l border-[#8b5cf6]/15 pl-6 md:pl-8 mb-12">
+              <h3 className="text-base md:text-lg font-semibold text-white mb-1">
+                Full-stack Developer Intern
+              </h3>
+              <div className="font-mono text-[11px] text-[#8b5cf6] tracking-wide mb-4">
+                La Rose Noire — Dec 2025 – Mar 2026
+              </div>
+              <ul className="space-y-2">
+                <li className="text-sm text-white/35 leading-relaxed">
+                  Built a role-based item request approval workflow processing 1,000+ requests across 20+ departments.
+                </li>
+                <li className="text-sm text-white/35 leading-relaxed">
+                  Developed a synchronized audio broadcast system streaming to 10+ rooms simultaneously.
+                </li>
+                <li className="text-sm text-white/35 leading-relaxed">
+                  Implemented a duty manager scheduling system with shift-based calendar and photo-upload verification.
+                </li>
+              </ul>
+            </div>
+
+            {/* Education */}
+            <div className="border-l border-white/[0.06] pl-6 md:pl-8">
+              <h3 className="text-base md:text-lg font-semibold text-white mb-1">
+                BS in Computer Science
+              </h3>
+              <div className="font-mono text-[11px] text-white/30 tracking-wide">
+                Holy Angel University — Graduating April 2026
+              </div>
+            </div>
+          </div>
+        </div>
+      </AnimatedSection>
+
+      {/* ─── Skills (05) ─────────────────────── */}
+      <AnimatedSection id="skills" className="py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <SectionHeading number="05" title="Skills" />
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16 max-w-4xl">
+            {skillCategories.map((cat) => (
+              <div key={cat.title}>
+                <div className="font-mono text-[10px] text-white/20 tracking-[2px] uppercase mb-4">
+                  {cat.title}
+                </div>
+                <div className="space-y-2">
+                  {cat.skills.map((skill) => (
+                    <div key={skill} className="text-sm text-white/45">
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </AnimatedSection>
+
+      {/* ─── Contact (06) ────────────────────── */}
+      <AnimatedSection id="contact" className="py-24 md:py-40">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <SectionHeading number="06" title="Contact" />
+
+          <div className="max-w-lg">
+            <p className="text-3xl md:text-4xl font-light text-white leading-tight mb-6">
+              Let&apos;s build something
+              <br />
+              together.
+            </p>
+            <a
+              href="mailto:Rionkudo3@gmail.com"
+              className="text-[#8b5cf6] text-sm md:text-base tracking-wide hover:text-[#a78bfa] transition-colors"
+            >
+              Rionkudo3@gmail.com
+            </a>
+
+            <div className="flex items-center gap-4 mt-8">
+              <a
+                href="https://github.com/Rk4three"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[11px] tracking-[1px] text-white/25 hover:text-white/50 transition-colors py-2 px-1"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://linkedin.com/in/rion-kudo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[11px] tracking-[1px] text-white/25 hover:text-white/50 transition-colors py-2 px-1"
+              >
+                LinkedIn
+              </a>
+              <a
+                href={RESUME_URL}
+                download="Rion_Kudo_Resume.pdf"
+                className="font-mono text-[11px] tracking-[1px] text-white/25 hover:text-white/50 transition-colors inline-flex items-center gap-1.5 py-2 px-1"
+              >
+                <Download className="w-3 h-3" />
+                Download Resume
+              </a>
+            </div>
+          </div>
+        </div>
+      </AnimatedSection>
+
+      {/* ─── Footer ──────────────────────────── */}
+      <footer className="border-t border-white/[0.04] py-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-4">
+          <span className="font-mono text-[10px] text-white/15 tracking-wide">
+            © 2026 Rion Kudo
+          </span>
+          <span className="font-mono text-[10px] text-white/10 tracking-wide">
+            Built with Next.js & Tailwind
+          </span>
+        </div>
+      </footer>
+    </main>
   )
 }
